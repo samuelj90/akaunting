@@ -2,8 +2,10 @@
 
 return [
 
-    'reconcile'             => 'Afstemme',
+    'reconcile'             => 'Afstem',
+    'unreconcile'           => 'Uafsem',
     'reconciled'            => 'Afstemt',
+    'opening_balance'       => 'Åbningsbalance',
     'closing_balance'       => 'Primo saldo',
     'unreconciled'          => 'Uafstemt',
     'transactions'          => 'Transaktioner',

@@ -55,6 +55,14 @@ class Form extends Provider
             'name', 'text', 'icon', 'values', 'selected' => null, 'attributes' => ['required' => 'required'], 'col' => 'col-md-6', 'group_class' => null
         ]);
 
+        Facade::component('multiSelectRemoteGroup', 'partials.form.multi_select_remote_group', [
+            'name', 'text', 'icon', 'values', 'selected' => null, 'attributes' => ['required' => 'required'], 'col' => 'col-md-6', 'group_class' => null
+        ]);
+
+        Facade::component('multiSelectRemoteAddNewGroup', 'partials.form.multi_select_remote_add_new_group', [
+            'name', 'text', 'icon', 'values', 'selected' => null, 'attributes' => ['required' => 'required', 'path' => ''], 'col' => 'col-md-6', 'group_class' => null
+        ]);
+
         Facade::component('selectGroup', 'partials.form.select_group', [
             'name', 'text', 'icon', 'values', 'selected' => null, 'attributes' => ['required' => 'required'], 'col' => 'col-md-6', 'group_class' => null
         ]);
@@ -75,6 +83,10 @@ class Form extends Provider
             'name', 'text', 'icon', 'values', 'selected' => null, 'attributes' => ['required' => 'required'], 'col' => 'col-md-6', 'group_class' => null
         ]);
 
+        Facade::component('selectRemoteAddNewGroup', 'partials.form.select_remote_add_new_group', [
+            'name', 'text', 'icon', 'values', 'selected' => null, 'attributes' => ['required' => 'required', 'path' => ''], 'col' => 'col-md-6', 'group_class' => null
+        ]);
+
         Facade::component('textareaGroup', 'partials.form.textarea_group', [
             'name', 'text', 'icon', 'value' => null, 'attributes' => ['rows' => '3'], 'col' => 'col-md-12', 'group_class' => null
         ]);
@@ -88,7 +100,7 @@ class Form extends Provider
         ]);
 
         Facade::component('checkboxGroup', 'partials.form.checkbox_group', [
-            'name', 'text', 'items' => [], 'value' => 'name', 'id' => 'id', 'attributes' => ['required' => 'required'], 'col' => 'col-md-12',
+            'name', 'text', 'items' => [], 'value' => 'name', 'id' => 'id', 'selected'=>[], 'attributes' => ['required' => 'required'], 'col' => 'col-md-12',
         ]);
 
         Facade::component('fileGroup', 'partials.form.file_group', [
@@ -108,7 +120,7 @@ class Form extends Provider
         ]);
 
         Facade::component('recurring', 'partials.form.recurring', [
-            'page', 'model' => null,
+            'page', 'model' => null, 'col' => 'col-md-6',
         ]);
 
         Facade::component('invoice_text', 'partials.form.invoice_text', [

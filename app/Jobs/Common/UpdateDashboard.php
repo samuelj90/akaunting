@@ -35,11 +35,13 @@ class UpdateDashboard extends Job
     {
         $this->authorize();
 
-        $this->dashboard->update($this->request->all());
+        \DB::transaction(function () {
+            $this->dashboard->update($this->request->all());
 
-        if ($this->request->has('users')) {
-            $this->dashboard->users()->sync($this->request->get('users'));
-        }
+            if ($this->request->has('users')) {
+                $this->dashboard->users()->sync($this->request->get('users'));
+            }
+        });
 
         return $this->dashboard;
     }
@@ -75,7 +77,7 @@ class UpdateDashboard extends Job
         }
 
         // Check if user can access dashboard
-        if (!$this->isUserDashboard($this->dashboard->id)) {
+        if ($this->isNotUserDashboard($this->dashboard->id)) {
             $message = trans('dashboards.error.not_user_dashboard');
 
             throw new \Exception($message);

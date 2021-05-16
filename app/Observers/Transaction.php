@@ -3,8 +3,8 @@
 namespace App\Observers;
 
 use App\Abstracts\Observer;
-use App\Jobs\Purchase\CreateBillHistory;
-use App\Jobs\Sale\CreateInvoiceHistory;
+use App\Events\Document\TransactionsCounted;
+use App\Jobs\Document\CreateDocumentHistory;
 use App\Models\Banking\Transaction as Model;
 use App\Traits\Jobs;
 
@@ -33,22 +33,32 @@ class Transaction extends Observer
     {
         $invoice = $transaction->invoice;
 
-        $invoice->status = ($invoice->transactions->count() > 1) ? 'partial' : 'sent';
+        $invoice->transactions_count = $invoice->transactions->count();
+        event(new TransactionsCounted($invoice));
+
+        $invoice->status = ($invoice->transactions_count > 0) ? 'partial' : 'sent';
+
+        unset($invoice->transactions_count);
 
         $invoice->save();
 
-        $this->dispatch(new CreateInvoiceHistory($invoice, 0, $this->getDescription($transaction)));
+        $this->dispatch(new CreateDocumentHistory($invoice, 0, $this->getDescription($transaction)));
     }
 
     protected function updateBill($transaction)
     {
         $bill = $transaction->bill;
 
-        $bill->status = ($bill->transactions->count() > 1) ? 'partial' : 'received';
+        $bill->transactions_count = $bill->transactions->count();
+        event(new TransactionsCounted($bill));
+
+        $bill->status = ($bill->transactions_count > 0) ? 'partial' : 'received';
+
+        unset($bill->transactions_count);
 
         $bill->save();
 
-        $this->dispatch(new CreateBillHistory($bill, 0, $this->getDescription($transaction)));
+        $this->dispatch(new CreateDocumentHistory($bill, 0, $this->getDescription($transaction)));
     }
 
     protected function getDescription($transaction)

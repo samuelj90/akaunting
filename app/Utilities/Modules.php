@@ -2,6 +2,7 @@
 
 namespace App\Utilities;
 
+use App\Events\Module\PaymentMethodShowing;
 use Cache;
 use Date;
 
@@ -16,8 +17,8 @@ class Modules
 
         $contact = true;
 
-        if (user()) {
-            $contact = user()->contact;
+        if ($user = user()) {
+            $contact = $user->contact;
         }
 
         if ($contact && ($type != 'all')) {
@@ -34,9 +35,9 @@ class Modules
         $modules->payment_methods = [];
 
         // Fire the event to get the list of payment methods
-        event(new \App\Events\Module\PaymentMethodShowing($modules));
+        event(new PaymentMethodShowing($modules));
 
-        foreach ($modules->payment_methods as $method) {
+        foreach ((array) $modules->payment_methods as $method) {
             if (!isset($method['name']) || !isset($method['code'])) {
                 continue;
             }
@@ -71,7 +72,7 @@ class Modules
 
     public static function getPaymentMethodsCacheKey($type)
     {
-        return 'payment_methods.' . session('company_id') . '.' . $type;
+        return 'payment_methods.' . company_id() . '.' . $type;
     }
 
     protected static function sortPaymentMethods(&$list)

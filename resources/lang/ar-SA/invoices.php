@@ -13,7 +13,7 @@ return [
     'price'                 => 'السعر',
     'sub_total'             => 'المجموع الجزئي',
     'discount'              => 'الخصم',
-    'item_discount'         => 'Line Discount',
+    'item_discount'         => 'خصم على هذه المنتجات',
     'tax_total'             => 'إجمالي الضريبة',
     'total'                 => 'الإجمالي',
 
@@ -31,7 +31,7 @@ return [
     'mark_paid'             => 'التحديد كمدفوع',
     'mark_sent'             => 'التحديد كمرسل',
     'mark_viewed'           => 'وضع علامة مشاهدة',
-    'mark_cancelled'        => 'Mark Cancelled',
+    'mark_cancelled'        => 'العلامه ألغيت',
     'download_pdf'          => 'تحميل PDF',
     'send_mail'             => 'إرسال بريد إلكتروني',
     'all_invoices'          => 'سجّل الدخول لعرض جميع الفواتير',
@@ -40,24 +40,7 @@ return [
     'get_paid'              => 'إحصل عالمبلغ',
     'accept_payments'       => 'قبول المدفوعات اﻹلكترونية',
 
-    'statuses' => [
-        'draft'             => 'مسودة',
-        'sent'              => 'تم الإرسال',
-        'viewed'            => 'شُوهدت',
-        'approved'          => 'تم الموافقة عليه',
-        'partial'           => 'جزئي',
-        'paid'              => 'مدفوع',
-        'overdue'           => 'متأخر',
-        'unpaid'            => 'غير مدفوع',
-        'cancelled'         => 'Cancelled',
-    ],
-
     'messages' => [
-        'email_sent'        => 'تم إرسال الفاتورة عبر البريد اﻹلكتروني!',
-        'marked_sent'       => 'الفاتورة عُلّمت كمرسلة!',
-        'marked_paid'       => 'الفاتورة عُلّمت كمدفوع!',
-        'marked_viewed'     => 'Invoice marked as viewed!',
-        'marked_cancelled'  => 'Invoice marked as cancelled!',
         'email_required'    => 'لا يوجد عنوان البريد إلكتروني لهذا العميل!',
         'draft'             => 'هذه <b>مسودة</b> الفاتورة و سوف تظهر في النظام بعد ارسالها.',
 

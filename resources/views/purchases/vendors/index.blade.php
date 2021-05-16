@@ -3,15 +3,15 @@
 @section('title', trans_choice('general.vendors', 2))
 
 @section('new_button')
-    @permission('create-purchases-vendors')
-        <span><a href="{{ route('vendors.create') }}" class="btn btn-success btn-sm header-button-top"><span class="fa fa-plus"></span> &nbsp;{{ trans('general.add_new') }}</a></span>
-        <span><a href="{{ route('import.create', ['group' => 'purchases', 'type' => 'vendors']) }}" class="btn btn-white btn-sm header-button-top"><span class="fa fa-upload"></span> &nbsp;{{ trans('import.import') }}</a></span>
-    @endpermission
-    <span><a href="{{ route('vendors.export', request()->input()) }}" class="btn btn-white btn-sm header-button-top"><span class="fa fa-download"></span> &nbsp;{{ trans('general.export') }}</a></span>
+    @can('create-purchases-vendors')
+        <a href="{{ route('vendors.create') }}" class="btn btn-success btn-sm">{{ trans('general.add_new') }}</a>
+        <a href="{{ route('import.create', ['group' => 'purchases', 'type' => 'vendors']) }}" class="btn btn-white btn-sm">{{ trans('import.import') }}</a>
+    @endcan
+    <a href="{{ route('vendors.export', request()->input()) }}" class="btn btn-white btn-sm">{{ trans('general.export') }}</a>
 @endsection
 
 @section('content')
-    @if ($vendors->count())
+    @if ($vendors->count() || request()->get('search', false))
         <div class="card">
             <div class="card-header border-bottom-0" :class="[{'bg-gradient-primary': bulk_action.show}]">
                 {!! Form::open([
@@ -21,10 +21,7 @@
                     'class' => 'mb-0'
                 ]) !!}
                     <div class="align-items-center" v-if="!bulk_action.show">
-                        <akaunting-search
-                            :placeholder="'{{ trans('general.search_placeholder') }}'"
-                            :options="{{ json_encode([]) }}"
-                        ></akaunting-search>
+                        <x-search-string model="App\Models\Common\Contact" />
                     </div>
 
                     {{ Form::bulkActionRowGroup('general.vendors', $bulk_actions, ['group' => 'purchases', 'type' => 'vendors']) }}
@@ -36,11 +33,10 @@
                     <thead class="thead-light">
                         <tr class="row table-head-line">
                             <th class="col-sm-2 col-md-1 col-lg-1 col-xl-1 d-none d-sm-block">{{ Form::bulkActionAllGroup() }}</th>
-                            <th class="col-xs-4 col-sm-3 col-md-3 col-lg-3 col-xl-2">@sortablelink('name', trans('general.name'), ['filter' => 'active, visible'], ['class' => 'col-aka', 'rel' => 'nofollow'])</th>
-                            <th class="col-md-2 col-lg-2 col-xl-3 d-none d-md-block">@sortablelink('email', trans('general.email'))</th>
-                            <th class="col-sm-3 col-md-2 col-lg-2 col-xl-2 d-none d-sm-block">@sortablelink('phone', trans('general.phone'))</th>
-                            <th class="col-lg-2 col-xl-2 text-right d-none d-lg-block">@sortablelink('unpaid', trans('general.unpaid'))</th>
-                            <th class="col-xs-4 col-sm-2 col-md-2 col-lg-1 col-xl-1 text-center">@sortablelink('enabled', trans('general.enabled'))</th>
+                            <th class="col-xs-4 col-sm-3 col-md-4 col-lg-3 col-xl-3">@sortablelink('name', trans('general.name'), ['filter' => 'active, visible'], ['class' => 'col-aka', 'rel' => 'nofollow'])</th>
+                            <th class="col-md-3 col-lg-3 col-xl-3 d-none d-md-block">@sortablelink('email', trans('general.email'))</th>
+                            <th class="col-lg-2 col-xl-2 d-none d-lg-block text-right">@sortablelink('unpaid', trans('general.unpaid'))</th>
+                            <th class="col-xs-4 col-sm-2 col-md-2 col-lg-2 col-xl-2 text-center">@sortablelink('enabled', trans('general.enabled'))</th>
                             <th class="col-xs-4 col-sm-2 col-md-2 col-lg-1 col-xl-1 text-center">{{ trans('general.actions') }}</th>
                         </tr>
                     </thead>
@@ -51,26 +47,27 @@
                                 <td class="col-sm-2 col-md-1 col-lg-1 col-xl-1 d-none d-sm-block">
                                     {{ Form::bulkActionGroup($item->id, $item->name) }}
                                 </td>
-                                <td class="col-xs-4 col-sm-3 col-md-3 col-lg-3 col-xl-2">
+                                <td class="col-xs-4 col-sm-3 col-md-4 col-lg-3 col-xl-3">
                                     <a class="col-aka" href="{{ route('vendors.show', $item->id) }}">{{ $item->name }}</a>
                                 </td>
-                                <td class="col-md-2 col-lg-2 col-xl-3 d-none d-md-block long-texts">
-                                    {{ !empty($item->email) ? $item->email : trans('general.na') }}
+                                <td class="col-md-3 col-lg-3 col-xl-3 d-none d-md-block long-texts">
+                                    <el-tooltip content="{{ !empty($item->phone) ? $item->phone : trans('general.na') }}"
+                                        effect="dark"
+                                        placement="top">
+                                        <span>{{ !empty($item->email) ? $item->email : trans('general.na') }}</span>
+                                    </el-tooltip>
                                 </td>
-                                <td class="col-sm-3 col-md-2 col-lg-2 col-xl-2 d-none d-sm-block long-texts">
-                                    {{ $item->phone }}
-                                </td>
-                                <td class="col-lg-2 col-xl-2 text-right d-none d-lg-block long-texts">
+                                <td class="col-lg-2 col-xl-2 d-none d-lg-block text-right long-texts">
                                     @money($item->unpaid, setting('default.currency'), true)
                                 </td>
-                                <td class="col-xs-4 col-sm-2 col-md-2 col-lg-1 col-xl-1 text-center">
+                                <td class="col-xs-4 col-sm-2 col-md-2 col-lg-2 col-xl-2 text-center">
                                     @if (user()->can('update-purchases-vendors'))
                                         {{ Form::enabledGroup($item->id, $item->name, $item->enabled) }}
                                     @else
                                         @if ($item->enabled)
-                                            <badge rounded type="success" class="mw-60">{{ trans('general.yes') }}</badge>
+                                            <badge rounded type="success" class="mw-60 d-inline-block">{{ trans('general.yes') }}</badge>
                                         @else
-                                            <badge rounded type="danger" class="mw-60">{{ trans('general.no') }}</badge>
+                                            <badge rounded type="danger" class="mw-60 d-inline-block">{{ trans('general.no') }}</badge>
                                         @endif
                                     @endif
                                 </td>
@@ -82,14 +79,14 @@
                                         <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
                                             <a class="dropdown-item" href="{{ route('vendors.show', $item->id) }}">{{ trans('general.show') }}</a>
                                             <a class="dropdown-item" href="{{ route('vendors.edit', $item->id) }}">{{ trans('general.edit') }}</a>
-                                            @permission('create-purchases-vendors')
+                                            @can('create-purchases-vendors')
                                                 <div class="dropdown-divider"></div>
                                                 <a class="dropdown-item" href="{{ route('vendors.duplicate', $item->id) }}">{{ trans('general.duplicate') }}</a>
-                                            @endpermission
-                                            @permission('delete-purchases-vendors')
+                                            @endcan
+                                            @can('delete-purchases-vendors')
                                                 <div class="dropdown-divider"></div>
                                                 {!! Form::deleteLink($item, 'vendors.destroy') !!}
-                                            @endpermission
+                                            @endcan
                                         </div>
                                     </div>
                                 </td>
@@ -106,7 +103,7 @@
             </div>
         </div>
     @else
-        @include('partials.admin.empty_page', ['page' => 'vendors', 'docs_path' => 'purchases/vendors'])
+        <x-empty-page group="purchases" page="vendors" />
     @endif
 @endsection
 

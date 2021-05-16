@@ -17,7 +17,7 @@ class DateFormat
     public function handle($request, Closure $next)
     {
         if (($request->method() == 'POST') || ($request->method() == 'PATCH')) {
-            $fields = ['paid_at', 'due_at', 'billed_at', 'invoiced_at', 'started_at', 'ended_at'];
+            $fields = ['paid_at', 'due_at', 'issued_at', 'started_at', 'ended_at'];
 
             foreach ($fields as $field) {
                 $date = $request->get($field);
@@ -26,7 +26,11 @@ class DateFormat
                     continue;
                 }
 
-                $new_date = Date::parse($date)->format('Y-m-d')  . ' ' . Date::now()->format('H:i:s');
+                if (Date::parse($date)->format('H:i:s') == '00:00:00') {
+                    $new_date = Date::parse($date)->format('Y-m-d')  . ' ' . Date::now()->format('H:i:s');
+                } else {
+                    $new_date = Date::parse($date)->toDateTimeString();
+                }
 
                 $request->request->set($field, $new_date);
             }

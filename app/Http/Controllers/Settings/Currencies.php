@@ -21,7 +21,7 @@ class Currencies extends Controller
     {
         $currencies = Currency::collect();
 
-        return view('settings.currencies.index', compact('currencies'));
+        return $this->response('settings.currencies.index', compact('currencies'));
     }
 
     /**
@@ -45,8 +45,9 @@ class Currencies extends Controller
         $current = Currency::pluck('code')->toArray();
 
         // Prepare codes
-        $codes = array();
+        $codes = [];
         $currencies = MoneyCurrency::getCurrencies();
+
         foreach ($currencies as $key => $item) {
             // Don't show if already available
             if (in_array($key, $current)) {
@@ -56,7 +57,15 @@ class Currencies extends Controller
             $codes[$key] = $key;
         }
 
-        return view('settings.currencies.create', compact('codes'));
+        $precisions = (object) [
+            '0' => '0',
+            '1' => '1',
+            '2' => '2',
+            '3' => '3',
+            '4' => '4',
+        ];
+
+        return view('settings.currencies.create', compact('codes', 'precisions'));
     }
 
     /**
@@ -81,7 +90,7 @@ class Currencies extends Controller
 
             $message = $response['message'];
 
-            flash($message)->error();
+            flash($message)->error()->important();
         }
 
         return response()->json($response);
@@ -100,8 +109,9 @@ class Currencies extends Controller
         $current = Currency::pluck('code')->toArray();
 
         // Prepare codes
-        $codes = array();
+        $codes = [];
         $currencies = MoneyCurrency::getCurrencies();
+
         foreach ($currencies as $key => $item) {
             // Don't show if already available
             if (($key != $currency->code) && in_array($key, $current)) {
@@ -114,7 +124,15 @@ class Currencies extends Controller
         // Set default currency
         $currency->default_currency = ($currency->code == setting('default.currency')) ? 1 : 0;
 
-        return view('settings.currencies.edit', compact('currency', 'codes'));
+        $precisions = (object) [
+            '0' => '0',
+            '1' => '1',
+            '2' => '2',
+            '3' => '3',
+            '4' => '4',
+        ];
+
+        return view('settings.currencies.edit', compact('currency', 'codes', 'precisions'));
     }
 
     /**
@@ -140,7 +158,7 @@ class Currencies extends Controller
 
             $message = $response['message'];
 
-            flash($message)->error();
+            flash($message)->error()->important();
         }
 
         return response()->json($response);
@@ -202,7 +220,7 @@ class Currencies extends Controller
         } else {
             $message = $response['message'];
 
-            flash($message)->error();
+            flash($message)->error()->important();
         }
 
         return response()->json($response);

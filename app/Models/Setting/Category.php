@@ -3,9 +3,14 @@
 namespace App\Models\Setting;
 
 use App\Abstracts\Model;
+use App\Models\Document\Document;
+use App\Traits\Transactions;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Category extends Model
 {
+    use HasFactory, Transactions;
+
     protected $table = 'categories';
 
     /**
@@ -16,30 +21,44 @@ class Category extends Model
     protected $fillable = ['company_id', 'name', 'type', 'color', 'enabled'];
 
     /**
+     * The attributes that should be cast.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'enabled' => 'boolean',
+    ];
+
+    /**
      * Sortable columns.
      *
      * @var array
      */
     public $sortable = ['name', 'type', 'enabled'];
 
+    public function documents()
+    {
+        return $this->hasMany('App\Models\Document\Document');
+    }
+
     public function bills()
     {
-        return $this->hasMany('App\Models\Purchase\Bill');
+        return $this->documents()->where('type', Document::BILL_TYPE);
     }
 
     public function expense_transactions()
     {
-        return $this->transactions()->where('type', 'expense');
+        return $this->transactions()->whereIn('type', (array) $this->getExpenseTypes());
     }
 
     public function income_transactions()
     {
-        return $this->transactions()->where('type', 'income');
+        return $this->transactions()->whereIn('type', (array) $this->getIncomeTypes());
     }
 
     public function invoices()
     {
-        return $this->hasMany('App\Models\Sale\Invoice');
+        return $this->documents()->where('type', Document::INVOICE_TYPE);
     }
 
     public function items()
@@ -126,5 +145,15 @@ class Category extends Model
     public function scopeTransfer($query)
     {
         return (int) $query->other()->pluck('id')->first();
+    }
+
+    /**
+     * Create a new factory instance for the model.
+     *
+     * @return \Illuminate\Database\Eloquent\Factories\Factory
+     */
+    protected static function newFactory()
+    {
+        return \Database\Factories\Category::new();
     }
 }

@@ -27,7 +27,7 @@
 
                     {{ Form::selectGroup('locale', trans_choice('general.languages', 1), 'flag', language()->allowed(), setting('default.locale')) }}
 
-                    {{ Form::selectGroup('landing_page', trans('auth.landing_page'), 'sign-in-alt', $routes, 'dashboard') }}
+                    {{ Form::selectGroup('landing_page', trans('auth.landing_page'), 'sign-in-alt', $landing_pages, 'dashboard') }}
 
                     @if (setting('default.use_gravatar', '0') == '1')
                         @stack('picture_input_start')
@@ -44,16 +44,16 @@
                             </div>
                         @stack('picture_input_end')
                     @else
-                        {{ Form::fileGroup('picture',  trans_choice('general.pictures', 1)) }}
+                        {{ Form::fileGroup('picture',  trans_choice('general.pictures', 1), '', ['dropzone-class' => 'form-file']) }}
                     @endif
 
-                    @permission('read-common-companies')
-                    {{ Form::multiSelectGroup('companies', trans_choice('general.companies', 2), 'user', $companies) }}
-                    @endpermission
+                    @can('read-common-companies')
+                    {{ Form::multiSelectRemoteGroup('companies', trans_choice('general.companies', 2), 'user', $companies, [], ['required' => 'required', 'remote_action' => route('companies.index')]) }}
+                    @endcan
 
-                    @permission('read-auth-roles')
+                    @can('read-auth-roles')
                         {{ Form::checkboxGroup('roles', trans_choice('general.roles', 2), $roles, 'display_name') }}
-                    @endpermission
+                    @endcan
 
                     {{ Form::radioGroup('enabled', trans('general.enabled'), true) }}
                 </div>

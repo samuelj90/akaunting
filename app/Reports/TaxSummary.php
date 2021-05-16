@@ -4,8 +4,7 @@ namespace App\Reports;
 
 use App\Abstracts\Report;
 use App\Models\Banking\Transaction;
-use App\Models\Purchase\Bill;
-use App\Models\Sale\Invoice;
+use App\Models\Document\Document;
 use App\Models\Setting\Tax;
 use App\Traits\Currencies;
 use App\Utilities\Recurring;
@@ -32,7 +31,9 @@ class TaxSummary extends Report
 
     public function setTables()
     {
-        $taxes = Tax::enabled()->where('rate', '<>', '0')->orderBy('name')->pluck('name')->toArray();
+        $withholding = ($this->getSetting('withholding') == 'yes') ? 'withholding' : 'notWithholding';
+
+        $taxes = Tax::enabled()->$withholding()->notRate(0)->orderBy('name')->pluck('name')->toArray();
 
         $this->tables = array_combine($taxes, $taxes);
     }
@@ -52,14 +53,14 @@ class TaxSummary extends Report
                 break;
             default:
                 // Invoices
-                $invoices = $this->applyFilters(Invoice::with('recurring', 'totals', 'transactions')->accrued(), ['date_field' => 'invoiced_at'])->get();
-                Recurring::reflect($invoices, 'invoiced_at');
-                $this->setTotals($invoices, 'invoiced_at');
+                $invoices = $this->applyFilters(Document::invoice()->with('recurring', 'totals', 'transactions')->accrued(), ['date_field' => 'issued_at'])->get();
+                Recurring::reflect($invoices, 'issued_at');
+                $this->setTotals($invoices, 'issued_at');
 
                 // Bills
-                $bills = $this->applyFilters(Bill::with('recurring', 'totals', 'transactions')->accrued(), ['date_field' => 'billed_at'])->get();
-                Recurring::reflect($bills, 'billed_at');
-                $this->setTotals($bills, 'billed_at');
+                $bills = $this->applyFilters(Document::bill()->with('recurring', 'totals', 'transactions')->accrued(), ['date_field' => 'issued_at'])->get();
+                Recurring::reflect($bills, 'issued_at');
+                $this->setTotals($bills, 'issued_at');
 
                 break;
         }
@@ -71,7 +72,7 @@ class TaxSummary extends Report
             // Make groups extensible
             $item = $this->applyGroups($item);
 
-            $type = (($item instanceof Invoice) || (($item instanceof Transaction) && ($item->type == 'income'))) ? 'income' : 'expense';
+            $type = ($item->type === Document::INVOICE_TYPE || $item->type === 'income') ? 'income' : 'expense';
 
             $date = $this->getFormattedDate(Date::parse($item->$date_field));
 
@@ -122,6 +123,25 @@ class TaxSummary extends Report
         return [
             $this->getPeriodField(),
             $this->getBasisField(),
+            $this->getWithholdingField(),
+        ];
+    }
+
+    public function getWithholdingField()
+    {
+        return [
+            'type' => 'selectGroup',
+            'name' => 'withholding',
+            'title' => trans('taxes.withholding'),
+            'icon' => 'hand-holding-usd',
+            'values' => [
+                'yes' => trans('general.yes'),
+                'no' => trans('general.no'),
+            ],
+            'selected' => 'no',
+            'attributes' => [
+                'required' => 'required',
+            ],
         ];
     }
 }

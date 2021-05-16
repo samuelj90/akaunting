@@ -32,17 +32,25 @@ class UpdateTransaction extends Job
     {
         $this->authorize();
 
-        $this->transaction->update($this->request->all());
+        \DB::transaction(function () {
+            $this->transaction->update($this->request->all());
 
-        // Upload attachment
-        if ($this->request->file('attachment')) {
-            $media = $this->getMedia($this->request->file('attachment'), 'transactions');
+            // Upload attachment
+            if ($this->request->file('attachment')) {
+                $this->deleteMediaModel($this->transaction, 'attachment', $this->request);
 
-            $this->transaction->attachMedia($media, 'attachment');
-        }
+                foreach ($this->request->file('attachment') as $attachment) {
+                    $media = $this->getMedia($attachment, 'transactions');
 
-        // Recurring
-        $this->transaction->updateRecurring();
+                    $this->transaction->attachMedia($media, 'attachment');
+                }
+            } elseif (!$this->request->file('attachment') && $this->transaction->attachment) {
+                $this->deleteMediaModel($this->transaction, 'attachment', $this->request);
+            }
+
+            // Recurring
+            $this->transaction->updateRecurring($this->request->all());
+        });
 
         return $this->transaction;
     }

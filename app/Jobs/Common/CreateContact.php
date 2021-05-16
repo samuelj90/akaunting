@@ -6,9 +6,12 @@ use App\Abstracts\Job;
 use App\Models\Auth\User;
 use App\Models\Auth\Role;
 use App\Models\Common\Contact;
+use Illuminate\Support\Str;
 
 class CreateContact extends Job
 {
+    protected $contact;
+
     protected $request;
 
     /**
@@ -28,13 +31,22 @@ class CreateContact extends Job
      */
     public function handle()
     {
-        if ($this->request->get('create_user', 'false') === 'true') {
-            $this->createUser();
-        }
+        \DB::transaction(function () {
+            if ($this->request->get('create_user', 'false') === 'true') {
+                $this->createUser();
+            }
 
-        $contact = Contact::create($this->request->all());
+            $this->contact = Contact::create($this->request->all());
 
-        return $contact;
+            // Upload logo
+            if ($this->request->file('logo')) {
+                $media = $this->getMedia($this->request->file('logo'), Str::plural($this->contact->type));
+    
+                $this->contact->attachMedia($media, 'logo');
+            }
+        });
+
+        return $this->contact;
     }
 
     public function createUser()
@@ -55,7 +67,7 @@ class CreateContact extends Job
 
         $user = User::create($data);
         $user->roles()->attach($customer_role);
-        $user->companies()->attach(session('company_id'));
+        $user->companies()->attach($data['company_id']);
 
         $this->request['user_id'] = $user->id;
     }

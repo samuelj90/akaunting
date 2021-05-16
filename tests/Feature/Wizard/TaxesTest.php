@@ -17,11 +17,15 @@ class TaxesTest extends FeatureTestCase
 
     public function testItShouldCreateTax()
     {
+        $request = $this->getRequest();
+
         $this->loginAs()
-            ->post(route('wizard.taxes.store'), $this->getRequest())
+            ->post(route('wizard.taxes.store'), $request)
             ->assertStatus(200);
 
         $this->assertFlashLevel('success');
+
+        $this->assertDatabaseHas('taxes', $request);
     }
 
     public function testItShouldUpdateTax()
@@ -37,21 +41,27 @@ class TaxesTest extends FeatureTestCase
             ->assertStatus(200);
 
         $this->assertFlashLevel('success');
+
+        $this->assertDatabaseHas('taxes', $request);
     }
 
     public function testItShouldDeleteTax()
     {
-        $tax = $this->dispatch(new CreateTax($this->getRequest()));
+        $request = $this->getRequest();
+
+        $tax = $this->dispatch(new CreateTax($request));
 
         $this->loginAs()
             ->delete(route('wizard.taxes.destroy', $tax->id))
             ->assertStatus(200);
 
         $this->assertFlashLevel('success');
+
+        $this->assertDatabaseHas('taxes', $request);
     }
 
     public function getRequest()
     {
-        return factory(Tax::class)->states('enabled')->raw();
+        return Tax::factory()->enabled()->raw();
     }
 }

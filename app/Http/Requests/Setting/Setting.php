@@ -23,10 +23,20 @@ class Setting extends FormRequest
      */
     public function rules()
     {
+        $name = 'nullable';
+        $email = 'nullable';
+        $logo = 'nullable';
+
+        if ($this->request->get('_prefix', null) == 'company') {
+            $name = 'required|string';
+            $email = 'required|email';
+            $logo = 'mimes:' . config('filesystems.mimes') . '|between:0,' . config('filesystems.max_size') * 1024 . '|dimensions:max_width=1000,max_height=1000';
+        }
+
         return [
-            //'company_name' => 'required|string',
-            //'company_email' => 'required|email',
-            //'company_logo' => 'mimes:' . config('filesystems.mimes'), 'pdf,jpeg,jpg,png'),
+            'name' => $name,
+            'email' => $email,
+            'logo' => $logo,
         ];
     }
 }

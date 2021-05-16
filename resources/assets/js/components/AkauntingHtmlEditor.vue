@@ -11,84 +11,134 @@
                 <button type="button" class="ql-list" value="bullet"></button>
             </div>
         </div>
+
         <div :id="editorId" :name="name" class="" ref="editor">
         </div>
     </div>
 </template>
+
 <script>
-  export default {
+import Quill from 'quill';
+
+//var Block = Quill.import('blots/block');
+//Block.tagName = 'div';
+//Quill.register(Block);
+
+export default {
     name: 'akaunting-html-editor',
+
     props: {
-      value: {
-        type: String,
-        default: ''
-      },
-      name: String
+        name: String,
+        value: {
+            type: String,
+            default: ''
+        },
+        theme: {
+            type: String,
+            default: 'snow'
+        },
+        readonly: {
+            type: Boolean,
+            default: false
+        },
     },
+
     data () {
-      return {
-        editor: null,
-        content: null,
-        lastHtmlValue: '',
-        editorId: null,
-        toolbarId: null
-      }
+        return {
+            editor: null,
+            editorValue: this.value,
+            content: null,
+            lastHtmlValue: '',
+            editorId: null,
+            toolbarId: null
+        }
     },
+
     methods: {
-      initialize (Quill) {
-        this.editor = new Quill(`#${this.editorId}`, {
-          theme: 'snow',
-          modules: {
-            toolbar: `#${this.toolbarId}`
-          }
-        })
+        initialize (Quill) {
+            let theme = this.theme;
 
-        if (this.value.length > 0) {
-          this.editor.pasteHTML(this.value)
-        }
+            this.editor = new Quill(`#${this.editorId}`, {
+                theme: theme,
+                modules: {
+                    toolbar: `#${this.toolbarId}`
+                },
+                readOnly: this.readonly
+            });
 
-        let editorRef = this.$refs.editor;
-        let node = editorRef.children[0];
-        this.editor.on('text-change', () => {
-          let html = node.innerHTML
-          if (html === '<p><br></p>') {
-            html = '';
-          }
-          this.content = html
-          this.$emit('input', this.content);
-        })
-      },
-      pasteHTML () {
-        if (!this.editor) {
-          return
-        }
-        this.editor.pasteHTML(this.value)
-      },
-      randomString() {
-        let text = "";
-        let possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+            if (this.editorValue.length > 0) {
+                this.editorValue = this.editorValue.replace(new RegExp('<p><br></p>', 'g'), '<p>&nbsp;</p>');
 
-        for (let i = 0; i < 5; i++)
-          text += possible.charAt(Math.floor(Math.random() * possible.length));
+                this.editor.pasteHTML(this.editorValue);
+            }
 
-        return text;
-      }
+            let editorRef = this.$refs.editor;
+            let node = editorRef.children[0];
+
+            this.editor.on('text-change', () => {
+                let html = node.innerHTML;
+
+                if (html === '<p><br></p>') {
+                    html = '';
+                } else {
+                    html = html.replace(new RegExp('<p><br></p>', 'g'), '<p>&nbsp;</p>');
+                }
+
+                this.content = html;
+
+                this.$emit('input', this.content);
+            });
+        },
+
+        pasteHTML () {
+            if (!this.editor) {
+                return;
+            }
+
+            this.editorValue = this.editorValue.replace(new RegExp('<p><br></p>', 'g'), '<p>&nbsp;</p>');
+
+            this.editor.pasteHTML(this.editorValue);
+        },
+
+        randomString() {
+            let text = "";
+            let possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+
+            for (let i = 0; i < 5; i++) {
+                text += possible.charAt(Math.floor(Math.random() * possible.length));
+            }
+
+            return text;
+        },
     },
+
     async mounted () {
-      let Quill = await import('quill')
-      Quill = Quill.default || Quill
-      this.editorId = this.randomString();
-      this.toolbarId = this.randomString();
-      this.$nextTick(() => {
-        this.initialize(Quill)
-      });
+        this.content = this.editorValue;
+
+        this.editorId = this.randomString();
+        this.toolbarId = this.randomString();
+
+        this.$nextTick(() => {
+            this.initialize(Quill)
+        });
     },
+
     watch: {
-      value (newVal) {
-        if (newVal !== this.content) {
-          this.pasteHTML(newVal);
-        }
-      }
-    }
-  }
+        value (newVal) {
+            if (newVal !== this.content) {
+                this.pasteHTML(newVal);
+            }
+        },
+
+        editorValue (newVal) {
+            if (newVal !== this.content) {
+                this.pasteHTML(newVal);
+            }
+        },
+
+        content (newVal) {
+            this.$emit('input', newVal);
+        },
+    },
+ }
 </script>

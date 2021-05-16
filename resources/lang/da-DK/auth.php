@@ -10,10 +10,10 @@ return [
     'forgot_password'       => 'Jeg har glemt min adgangskode',
     'reset_password'        => 'Nulstil adgangskode',
     'enter_email'           => 'Indtast din mailadresse',
-    'current_email'         => 'Nuværende E-mail',
+    'current_email'         => 'Nuværende e-mail',
     'reset'                 => 'Nulstil',
     'never'                 => 'Aldrig',
-    'landing_page'          => 'Landingsside',
+    'landing_page'          => 'Startside',
 
     'password' => [
         'current'           => 'Adgangskode',
@@ -24,16 +24,16 @@ return [
 
     'error' => [
         'self_delete'       => 'Fejl: Du kan ikke slette dig selv!',
-        'self_disable'      => 'Fejl: Du kan ikke disable dig selv!',
-        'no_company'        => 'Error: Ingen virksomhed er tilknyttet din konto. Kontakt systemadministratoren.',
+        'self_disable'      => 'Fejl: Du kan ikke deaktivere dig selv!',
+        'no_company'        => 'Fejl: Ingen enhed er tilknyttet din konto. Kontakt systemadministratoren.',
     ],
 
     'failed'                => 'Disse legitimationsoplysninger passer ikke med de gemte.',
     'disabled'              => 'Denne konto er deaktiveret. Kontakt systemadministratoren.',
-    'throttle'              => 'For mange login forsøg. Prøv igen om :seconds sekunder.',
+    'throttle'              => 'For mange loginforsøg. Prøv igen om :seconds sekunder.',
 
     'notification' => [
-        'message_1'     => 'Du modtager denne e-mail, fordi vi modtog en anmodning om nulstilling af password.',
+        'message_1'     => 'Du modtager denne e-mail, fordi vi har modtaget en anmodning om nulstilling af adgangskoden til din konto.',
         'message_2'     => 'Hvis du ikke har bedt om en nulstilling af adgangskoden, skal du ikke gøre yderligere.',
         'button'        => 'Nulstil adgangskode',
     ],

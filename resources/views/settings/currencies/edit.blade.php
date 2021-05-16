@@ -24,7 +24,7 @@
 
                     {{ Form::textGroup('rate', trans('currencies.rate'), 'sliders-h', ['@input' => 'onChangeRate', 'required' => 'required']) }}
 
-                    {{ Form::textGroup('precision', trans('currencies.precision'), 'dot-circle') }}
+                    {{ Form::selectGroup('precision', trans('currencies.precision'), 'dot-circle', $precisions, $currency->precision, ['model' => 'form.precision']) }}
 
                     {{ Form::textGroup('symbol', trans('currencies.symbol.symbol'), 'font') }}
 
@@ -36,17 +36,17 @@
 
                     {{ Form::radioGroup('enabled', trans('general.enabled'), $currency->enabled) }}
 
-                    {{ Form::radioGroup('default_currency', trans('currencies.default'), $currency->default_currency) }}
+                    {{ Form::radioGroup('default_currency', trans('currencies.default'), $currency->default_currency, '', '', ['disabled' => (setting('default.currency') == $currency->code) ? 'disabled': false]) }}
                 </div>
             </div>
 
-            @permission('update-settings-currencies')
+            @can('update-settings-currencies')
                 <div class="card-footer">
                     <div class="row save-buttons">
                         {{ Form::saveButtons('currencies.index') }}
                     </div>
                 </div>
-             @endpermission
+             @endcan
 
         {!! Form::close() !!}
     </div>

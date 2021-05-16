@@ -3,14 +3,16 @@
 namespace App\Jobs\Common;
 
 use App\Abstracts\Job;
+use App\Events\Common\CompanyCreated;
+use App\Events\Common\CompanyCreating;
 use App\Models\Common\Company;
 use Artisan;
 
 class CreateCompany extends Job
 {
-    protected $request;
-
     protected $company;
+
+    protected $request;
 
     /**
      * Create a new job instance.
@@ -29,15 +31,25 @@ class CreateCompany extends Job
      */
     public function handle()
     {
-        $this->company = Company::create($this->request->all());
+        $current_company_id = company_id();
 
-        // Clear settings
-        setting()->setExtraColumns(['company_id' => $this->company->id]);
-        setting()->forgetAll();
+        event(new CompanyCreating($this->request));
 
-        $this->callSeeds();
+        \DB::transaction(function () {
+            $this->company = Company::create($this->request->all());
 
-        $this->updateSettings();
+            $this->company->makeCurrent();
+
+            $this->callSeeds();
+
+            $this->updateSettings();
+        });
+
+        event(new CompanyCreated($this->company));
+
+        if (!empty($current_company_id)) {
+            company($current_company_id)->makeCurrent();
+        }
 
         return $this->company;
     }
@@ -84,6 +96,8 @@ class CreateCompany extends Job
         setting()->set([
             'company.name' => $this->request->get('name'),
             'company.email' => $this->request->get('email'),
+            'company.tax_number' => $this->request->get('tax_number'),
+            'company.phone' => $this->request->get('phone'),
             'company.address' => $this->request->get('address'),
             'default.currency' => $this->request->get('currency'),
             'default.locale' => $this->request->get('locale', 'en-GB'),
@@ -96,6 +110,5 @@ class CreateCompany extends Job
         }
 
         setting()->save();
-        setting()->forgetAll();
     }
 }

@@ -30,9 +30,15 @@
                         @elseif ($type == 'radioGroup')
                             {{ Form::$type($field['name'], trans($field['title']), isset($setting[$field['name']]) ? $setting[$field['name']] : 1, trans($field['enable']), trans($field['disable']), $field['attributes']) }}
                         @elseif ($type == 'checkboxGroup')
-                            {{ Form::$type($field['name'], trans($field['title']), $field['items'], $field['value'], $field['id'], $field['attributes']) }}
+                            {{ Form::$type($field['name'], trans($field['title']), $field['items'], $field['value'], $field['id'], $field['selected'], $field['attributes']) }}
                         @elseif ($type == 'fileGroup')
                             {{ Form::$type($field['name'], trans($field['title']), $field['attributes']) }}
+                        @elseif ($type == 'dateGroup')
+                            {{ Form::$type($field['name'], trans($field['title']), $field['icon'], array_merge(['id' => $field['name'], 'date-format' => 'Y-m-d', 'show-date-format' => company_date_format(), 'autocomplete' => 'off'], $field['attributes']), Date::parse($setting[$field['name']] ?? now())->toDateString()) }}
+                        @elseif ($type == 'accountSelectGroup')
+                            {{ Form::selectGroup($field['name'], trans_choice('general.accounts', 1), 'university', $accounts, setting($module->getAlias() . '.' . $field['name']), $field['attributes']) }}
+                        @elseif ($type == 'categorySelectGroup')
+                            {{ Form::selectGroup($field['name'], trans_choice('general.categories', 1), 'folder', $categories, setting($module->getAlias() . '.' . $field['name']), $field['attributes']) }}
                         @endif
                     @endforeach
 
@@ -40,13 +46,13 @@
                 </div>
             </div>
 
-            @permission('update-' . $module->getAlias() . '-settings')
+            @can('update-' . $module->getAlias() . '-settings')
                 <div class="card-footer">
                     <div class="row save-buttons">
                         {{ Form::saveButtons('settings.index') }}
                     </div>
                 </div>
-            @endpermission
+            @endcan
 
         {!! Form::close() !!}
     </div>

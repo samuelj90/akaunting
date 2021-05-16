@@ -3,8 +3,8 @@
 @section('title', trans_choice('general.modules', 2))
 
 @section('new_button')
-    <span><a href="{{ route('apps.api-key.create') }}" class="btn btn-white btn-sm header-button-top"><span class="fa fa-key"></span> &nbsp;{{ trans('modules.api_key') }}</a></span>
-    <span><a href="{{ route('apps.my.index')  }}" class="btn btn-white btn-sm header-button-top"><span class="fa fa-user"></span> &nbsp;{{ trans('modules.my_apps') }}</a></span>
+    <a href="{{ route('apps.api-key.create') }}" class="btn btn-white btn-sm">{{ trans('modules.api_key') }}</a>
+    <a href="{{ route('apps.my.index') }}" class="btn btn-white btn-sm">{{ trans('modules.my_apps') }}</a>
 @endsection
 
 @section('content')
@@ -24,6 +24,7 @@
                         @for($i = 1; $i <= $module->vote; $i++)
                             <i class="fa fa-star fa-sm text-yellow"></i>
                         @endfor
+
                         @for($i = $module->vote; $i < 5; $i++)
                             <i class="fa fa-star-o fa-sm"></i>
                         @endfor
@@ -108,7 +109,7 @@
                          @endif
 
                          <div class="tab-pane fade" id="review">
-                            @php 
+                            @php
                                 $reviews = $module->app_reviews;
                             @endphp
 
@@ -177,7 +178,7 @@
                                 <div class="row">
                                     <div class="col-md-12 text-right">
                                         @if (!empty($module->review_action))
-                                            <a href="{{ $module->review_action }}" class="btn btn-success header-button-top" target="_blank">
+                                            <a href="{{ $module->review_action }}" class="btn btn-success" target="_blank">
                                                 {{ trans('modules.reviews.button.add') }}
                                             </a>
                                         @endif
@@ -218,21 +219,21 @@
 
                 <div class="card-footer">
                     @if ($installed)
-                        @permission('delete-modules-item')
+                        @can('delete-modules-item')
                             <a href="{{ route('apps.app.uninstall', $module->slug) }}" class="btn btn-block btn-danger">{{ trans('modules.button.uninstall') }}</a>
-                        @endpermission
+                        @endcan
 
-                        @permission('update-modules-item')
+                        @can('update-modules-item')
                             @if ($enable)
                                 <a href="{{ route('apps.app.disable', $module->slug) }}" class="btn btn-block btn-warning">{{ trans('modules.button.disable') }}</a>
                             @else
                                 <a href="{{ route('apps.app.enable', $module->slug) }}" class="btn btn-block btn-success">{{ trans('modules.button.enable') }}</a>
                             @endif
-                        @endpermission
+                        @endcan
                     @else
-                        @permission('create-modules-item')
+                        @can('create-modules-item')
                             @if ($module->install)
-                                <button type="button" @click="onInstall('{{ $module->action_url }}', '{{ $module->name }}', '{{ $module->version }}')" class="btn btn-success btn-block" id="install-module">
+                                <button type="button" @click="onInstall('{{ $module->action_url }}', '{{ $module->slug }}', '{{ $module->name }}', '{{ $module->version }}')" class="btn btn-success btn-block" id="install-module">
                                     {{ trans('modules.install') }}
                                 </button>
                             @else
@@ -240,7 +241,7 @@
                                     {{ trans('modules.buy_now') }}
                                 </a>
                             @endif
-                        @endpermission
+                        @endcan
                     @endif
 
                     @if (!empty($module->purchase_desc))

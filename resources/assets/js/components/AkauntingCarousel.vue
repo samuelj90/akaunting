@@ -18,17 +18,35 @@
             </el-carousel-item>
 
             <el-carousel-item v-for="(screenshot, index) in screenshots" :key="index">
-                <img class="d-block w-100 carousel-frame" height="365px" :src="screenshot.path_string" :alt="screenshot.alt_attribute">
-                <div class="carousel-description py-2">
+                <img @click="openGallery(index)" class="d-block w-100 carousel-frame" height="365px" :src="screenshot.path_string" :alt="screenshot.alt_attribute">
+                <div class="carousel-description py-2" v-if="screenshot.description">
                     {{ screenshot.description }}
+                </div>
+                <div class="carousel-description py-2" v-else>
+                    {{ name }}
                 </div>
             </el-carousel-item>
         </el-carousel>
+
+      <LightBox
+        v-if="media.length"
+        ref="lightbox"
+        :media="media"
+        :show-caption="true"
+        :show-light-box="false"
+      />
     </div>
 </template>
 
 <script>
+import Vue from 'vue';
 import {Image, Carousel, CarouselItem} from 'element-ui';
+
+import LightBox from 'vue-image-lightbox';
+import 'vue-image-lightbox/dist/vue-image-lightbox.min.css';
+import VueLazyLoad from 'vue-lazyload';
+
+Vue.use(VueLazyLoad);
 
 export default {
     name: "akaunting-carousel",
@@ -37,6 +55,7 @@ export default {
         [Image.name]: Image,
         [Carousel.name]: Carousel,
         [CarouselItem.name]: CarouselItem,
+        LightBox
     },
 
     props: {
@@ -62,7 +81,7 @@ export default {
         },
         initial_index: {
             type: Number,
-            default: 1,
+            default: 0,
             description: "index of the initially active slide (starting from 0)"
         },
         trigger: {
@@ -104,6 +123,36 @@ export default {
             type: String,
             default: 'horizontal',
             description: "display direction (horizontal/vertical)"
+        }
+    },
+
+    mounted() {
+        let media = [];
+
+        if (this.screenshots.length) {
+            let name = this.name;
+
+            this.screenshots.forEach(function(screenshot) {
+                media.push({ // For image
+                    thumb: screenshot.path_string,
+                    src: screenshot.path_string,
+                    caption: (screenshot.description.length) ? screenshot.description : name,
+                });
+            });
+        }
+
+        this.media = media;
+    },
+
+    data: function () {
+        return {
+            media: [],
+        }
+    },
+
+    methods: {
+        openGallery(index) {
+            this.$refs.lightbox.showImage(index)
         }
     }
 }

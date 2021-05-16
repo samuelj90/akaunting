@@ -3,7 +3,7 @@
 return [
 
     'bill_number'           => 'Fakturanummer',
-    'bill_date'             => 'Faktura dato',
+    'bill_date'             => 'Fakturadato',
     'total_price'           => 'Total pris',
     'due_date'              => 'Forfaldsdato',
     'order_number'          => 'Ordrenummer',
@@ -19,9 +19,9 @@ return [
 
     'item_name'             => 'Varenavn|Varenavne',
 
-    'show_discount'         => ':discount% Rabat',
+    'show_discount'         => ':discount% rabat',
     'add_discount'          => 'Tilføj rabat',
-    'discount_desc'         => 'subtotal',
+    'discount_desc'         => 'af subtotal',
 
     'payment_due'           => 'Betalingsfrist',
     'amount_due'            => 'Forfaldent beløb',
@@ -29,35 +29,22 @@ return [
     'histories'             => 'Historik',
     'payments'              => 'Betalinger',
     'add_payment'           => 'Tilføj betaling',
-    'mark_paid'             => 'Marker Betalt',
+    'mark_paid'             => 'Marker som betalt',
     'mark_received'         => 'Modtagelse godkendt',
-    'mark_cancelled'        => 'Marker Annuller',
+    'mark_cancelled'        => 'Marker som annulleret',
     'download_pdf'          => 'Download PDF',
-    'send_mail'             => 'Send E-mail',
-    'create_bill'           => 'Opret regning',
-    'receive_bill'          => 'Modtag regning',
+    'send_mail'             => 'Send e-mail',
+    'create_bill'           => 'Opret faktura',
+    'receive_bill'          => 'Modtag faktura',
     'make_payment'          => 'Opret betaling',
 
-    'statuses' => [
-        'draft'             => 'Kladde',
-        'received'          => 'Modtaget',
-        'partial'           => 'Delvis',
-        'paid'              => 'Betalt',
-        'overdue'           => 'Overskredet',
-        'unpaid'            => 'Ubetalt',
-        'cancelled'         => 'Annuleret',
-    ],
-
     'messages' => [
-        'marked_received'   => 'Regning markeret som modtaget',
-        'marked_paid'       => 'Regning markeret som betalt',
-        'marked_cancelled'  => 'Regning markeret som annulleret',
-        'draft'             => 'Dette er et <b>UDKAST</b> til faktura og vil blive afspejlet i diagrammer, når den bliver modtaget.',
+        'draft'             => 'Dette er et <b>UDKAST</b> til faktura og vil først blive vist i oversigten, når den er afsendt.',
 
         'status' => [
             'created'       => 'Oprettet den :date',
             'receive' => [
-                'draft'     => 'Ikke sendt',
+                'draft'     => 'Ikke modtaget',
                 'received'  => 'Modtaget den :date',
             ],
             'paid' => [

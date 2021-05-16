@@ -117,7 +117,7 @@ class Installer
         }
 
         if (Console::run('help') !== true) {
-            $requirements[] = trans('install.requirements.executable', ['php_version' => AKAUNTING_PHP]);
+            $requirements[] = trans('install.error.php_version', ['php_version' => AKAUNTING_PHP]);
         }
 
         return $requirements;
@@ -209,7 +209,7 @@ class Installer
             'DB_PORT'       =>  $port,
             'DB_DATABASE'   =>  $database,
             'DB_USERNAME'   =>  $username,
-            'DB_PASSWORD'   =>  $password,
+            'DB_PASSWORD'   =>  '"' . $password . '"',
             'DB_PREFIX'     =>  $prefix,
         ]);
 

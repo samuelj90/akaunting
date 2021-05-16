@@ -38,24 +38,40 @@ class UpdateUser extends Job
             unset($this->request['password_confirmation']);
         }
 
-        $this->user->update($this->request->input());
+        \DB::transaction(function () {
+            $this->user->update($this->request->input());
 
-        // Upload picture
-        if ($this->request->file('picture')) {
-            $media = $this->getMedia($this->request->file('picture'), 'users');
+            // Upload picture
+            if ($this->request->file('picture')) {
+                $media = $this->getMedia($this->request->file('picture'), 'users');
 
-            $this->user->attachMedia($media, 'picture');
-        }
+                $this->user->attachMedia($media, 'picture');
+            }
 
-        // Sync roles
-        if ($this->request->has('roles')) {
-            $this->user->roles()->sync($this->request->get('roles'));
-        }
+            if ($this->request->has('roles')) {
+                $this->user->roles()->sync($this->request->get('roles'));
+            }
 
-        // Sync companies
-        if ($this->request->has('companies')) {
-            $this->user->companies()->sync($this->request->get('companies'));
-        }
+            if ($this->request->has('companies')) {
+                if (app()->runningInConsole() || request()->isInstall()) {
+                    $this->user->companies()->sync($this->request->get('companies'));
+                } else {
+                    $user = user();
+
+                    $companies = $user->withoutEvents(function () use ($user) {
+                        return $user->companies()->whereIn('id', $this->request->get('companies'))->pluck('id');
+                    });
+
+                    if ($companies->isNotEmpty()) {
+                        $this->user->companies()->sync($companies->toArray());
+                    }
+                }
+            }
+
+            if ($this->user->contact) {
+                $this->user->contact->update($this->request->input());
+            }
+        });
 
         return $this->user;
     }

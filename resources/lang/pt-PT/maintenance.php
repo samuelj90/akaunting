@@ -4,8 +4,6 @@ return [
 
     'title' => 'Em Manutenção',
 
-    'message' => 'Sorry, we\'re down for maintenance. Please, try again later!',
-
-    'last-updated' => 'This message was last updated :timestamp.',
+    'message' => 'Pedimos desculpa, estamos em manutenção. Por favor, volte a tentar mais logo!',
 
 ];

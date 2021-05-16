@@ -43,6 +43,10 @@ const app = new Vue({
         if (document.getElementById('closing_balance') != null) {
             this.totals.closing_balance = parseFloat(document.getElementById('closing_balance').value);
         }
+
+        if (this.form._method == 'PATCH') {
+            this.onCalculate();
+        }
     },
 
     methods:{
@@ -91,9 +95,9 @@ const app = new Vue({
             }
 
             if (cleared_amount > 0) {
-                difference = parseFloat(this.form.closing_balance) - parseFloat(cleared_amount);
+                difference = (parseFloat(this.form.closing_balance) - parseFloat(cleared_amount)).toFixed(this.currency.precision);
             } else {
-                difference = parseFloat(this.form.closing_balance) + parseFloat(cleared_amount);
+                difference = (parseFloat(this.form.closing_balance) + parseFloat(cleared_amount)).toFixed(this.currency.precision);
             }
 
             if (difference != 0) {

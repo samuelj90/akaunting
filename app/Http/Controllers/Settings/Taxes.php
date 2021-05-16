@@ -25,10 +25,11 @@ class Taxes extends Controller
             'fixed' => trans('taxes.fixed'),
             'normal' => trans('taxes.normal'),
             'inclusive' => trans('taxes.inclusive'),
+            'withholding' => trans('taxes.withholding'),
             'compound' => trans('taxes.compound'),
         ];
 
-        return view('settings.taxes.index', compact('taxes', 'types'));
+        return $this->response('settings.taxes.index', compact('taxes', 'types'));
     }
 
     /**
@@ -52,10 +53,17 @@ class Taxes extends Controller
             'fixed' => trans('taxes.fixed'),
             'normal' => trans('taxes.normal'),
             'inclusive' => trans('taxes.inclusive'),
+            'withholding' => trans('taxes.withholding'),
             'compound' => trans('taxes.compound'),
         ];
 
-        return view('settings.taxes.create', compact('types'));
+        $disable_options = [];
+
+        if ($compound = Tax::compound()->first()) {
+            $disable_options = ['compound'];
+        }
+
+        return view('settings.taxes.create', compact('types', 'disable_options'));
     }
 
     /**
@@ -80,7 +88,7 @@ class Taxes extends Controller
 
             $message = $response['message'];
 
-            flash($message)->error();
+            flash($message)->error()->important();
         }
 
         return response()->json($response);
@@ -99,10 +107,17 @@ class Taxes extends Controller
             'fixed' => trans('taxes.fixed'),
             'normal' => trans('taxes.normal'),
             'inclusive' => trans('taxes.inclusive'),
+            'withholding' => trans('taxes.withholding'),
             'compound' => trans('taxes.compound'),
         ];
 
-        return view('settings.taxes.edit', compact('tax', 'types'));
+        $disable_options = [];
+
+        if ($tax->type != 'compound' && $compound = Tax::compound()->first()) {
+            $disable_options = ['compound'];
+        }
+
+        return view('settings.taxes.edit', compact('tax', 'types', 'disable_options'));
     }
 
     /**
@@ -128,7 +143,7 @@ class Taxes extends Controller
 
             $message = $response['message'];
 
-            flash($message)->error();
+            flash($message)->error()->important();
         }
 
         return response()->json($response);
@@ -190,7 +205,7 @@ class Taxes extends Controller
         } else {
             $message = $response['message'];
 
-            flash($message)->error();
+            flash($message)->error()->important();
         }
 
         return response()->json($response);

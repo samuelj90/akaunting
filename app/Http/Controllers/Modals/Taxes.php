@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers\Modals;
 
+use App\Models\Setting\Tax;
+use App\Jobs\Setting\CreateTax;
 use App\Abstracts\Http\Controller;
 use App\Http\Requests\Setting\Tax as Request;
-use App\Jobs\Setting\CreateTax;
 
 class Taxes extends Controller
 {
@@ -28,8 +29,10 @@ class Taxes extends Controller
     public function create()
     {
         $types = [
+            'fixed' => trans('taxes.fixed'),
             'normal' => trans('taxes.normal'),
             'inclusive' => trans('taxes.inclusive'),
+            'withholding' => trans('taxes.withholding'),
             'compound' => trans('taxes.compound'),
         ];
 
@@ -41,7 +44,13 @@ class Taxes extends Controller
 
         $rand = rand();
 
-        $html = view('modals.taxes.create', compact('types', 'tax_selector', 'rand'))->render();
+        $disable_options = [];
+
+        if ($compound = Tax::compound()->first()) {
+            $disable_options = ['compound'];
+        }
+
+        $html = view('modals.taxes.create', compact('types', 'tax_selector', 'disable_options', 'rand'))->render();
 
         return response()->json([
             'success' => true,

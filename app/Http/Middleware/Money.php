@@ -3,6 +3,10 @@
 namespace App\Http\Middleware;
 
 use Closure;
+use OutOfBoundsException;
+use Illuminate\Support\Str;
+use InvalidArgumentException;
+use UnexpectedValueException;
 
 class Money
 {
@@ -15,42 +19,91 @@ class Money
      */
     public function handle($request, Closure $next)
     {
-        if ($request->method() == 'POST' || $request->method() == 'PATCH') {
-            $amount = $request->get('amount');
-            $bill_number = $request->get('bill_number');
-            $invoice_number = $request->get('invoice_number');
-            $sale_price = $request->get('sale_price');
-            $purchase_price = $request->get('purchase_price');
-            $opening_balance = $request->get('opening_balance');
-            $items = $request->get('items');
+        if (($request->method() != 'POST') && ($request->method() != 'PATCH')) {
+            return $next($request);
+        }
 
-            if (!empty($amount)) {
-                $amount = money($amount)->getAmount();
+        $currency_code = setting('default.currency');
 
-                $request->request->set('amount', $amount);
+        if ($request->has('currency_code')) {
+            $currency_code = $request->get('currency_code');
+        }
+
+        $parameters = [
+            'amount',
+            'sale_price',
+            'purchase_price',
+            'opening_balance',
+        ];
+
+        foreach ($parameters as $parameter) {
+            if (!$request->has($parameter)) {
+                continue;
             }
 
-            if (isset($bill_number) || isset($invoice_number) || !empty($items)) {
-                if (!empty($items)) {
-                    foreach ($items as $key => $item) {
-                        if (!isset($item['price'])) {
-                            continue;
-                        }
+            $money_format = $request->get($parameter);
 
-                        $items[$key]['price'] = money($item['price'])->getAmount();
+            if (!preg_match("/^(?=.*?[0-9])[0-9.,]+$/", $money_format)) {
+                continue;
+            }
+
+            if ($parameter == 'sale_price' || $parameter == 'purchase_price') {
+                $money_format = Str::replaceFirst(',', '.', $money_format);
+            }
+
+            $amount = $this->getAmount($money_format, $currency_code);
+
+            $request->request->set($parameter, $amount);
+        }
+
+        $document_number = $request->get('document_number');
+        $items = $request->get('items');
+
+        if (isset($document_number) || !empty($items)) {
+            if (!empty($items)) {
+                foreach ($items as $key => $item) {
+                    if (!isset($item['price'])) {
+                        continue;
                     }
 
-                    $request->request->set('items', $items);
+                    if (!preg_match("/^(?=.*?[0-9])[0-9.,]+$/", $item['price'])) {
+                        continue;
+                    }
+
+                    $amount = $item['price'];
+
+                    if (strpos($item['price'], config('money.' . $currency_code . '.symbol')) !== false) {
+                        $amount = $this->getAmount($item['price'], $currency_code);
+                    }
+
+                    $items[$key]['price'] = $amount;
                 }
-            }
 
-            if (isset($opening_balance)) {
-                $opening_balance = money($opening_balance)->getAmount();
-
-                $request->request->set('opening_balance', $opening_balance);
+                $request->request->set('items', $items);
             }
         }
 
         return $next($request);
+    }
+
+    protected function getAmount($money_format, $currency_code)
+    {
+        try {
+            if (config('money.' . $currency_code . '.decimal_mark') !== '.') {
+                $money_format = Str::replaceFirst('.', config('money.' . $currency_code . '.decimal_mark'), $money_format);
+            }
+
+            $amount = money($money_format, $currency_code)->getAmount();
+        } catch (InvalidArgumentException | OutOfBoundsException | UnexpectedValueException $e) {
+            logger($e->getMessage());
+
+            $amount = 0;
+
+            if ($money_format === null) {
+                $amount = $money_format;
+            }
+        }
+
+        return $amount;
     }
 }

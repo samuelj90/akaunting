@@ -3,9 +3,13 @@
 namespace App\Models\Banking;
 
 use App\Abstracts\Model;
+use App\Traits\Transactions;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Account extends Model
 {
+    use HasFactory, Transactions;
+
     protected $table = 'accounts';
 
     /**
@@ -23,6 +27,16 @@ class Account extends Model
     protected $fillable = ['company_id', 'name', 'number', 'currency_code', 'opening_balance', 'bank_name', 'bank_phone', 'bank_address', 'enabled'];
 
     /**
+     * The attributes that should be cast.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'opening_balance' => 'double',
+        'enabled' => 'boolean',
+    ];
+
+    /**
      * Sortable columns.
      *
      * @var array
@@ -36,12 +50,12 @@ class Account extends Model
 
     public function expense_transactions()
     {
-        return $this->transactions()->where('type', 'expense');
+        return $this->transactions()->whereIn('type', (array) $this->getExpenseTypes());
     }
 
     public function income_transactions()
     {
-        return $this->transactions()->where('type', 'income');
+        return $this->transactions()->whereIn('type', (array) $this->getIncomeTypes());
     }
 
     public function transactions()
@@ -57,17 +71,6 @@ class Account extends Model
     public function scopeNumber($query, $number)
     {
         return $query->where('number', '=', $number);
-    }
-
-    /**
-     * Convert opening balance to double.
-     *
-     * @param  string  $value
-     * @return void
-     */
-    public function setOpeningBalanceAttribute($value)
-    {
-        $this->attributes['opening_balance'] = (double) $value;
     }
 
     /**
@@ -87,5 +90,15 @@ class Account extends Model
         $total -= $this->expense_transactions->sum('amount');
 
         return $total;
+    }
+
+    /**
+     * Create a new factory instance for the model.
+     *
+     * @return \Illuminate\Database\Eloquent\Factories\Factory
+     */
+    protected static function newFactory()
+    {
+        return \Database\Factories\Account::new();
     }
 }

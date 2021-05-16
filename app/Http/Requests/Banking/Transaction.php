@@ -26,7 +26,7 @@ class Transaction extends FormRequest
     {
         $attachment = 'nullable';
 
-        if ($this->request->get('attachment', null)) {
+        if ($this->files->get('attachment')) {
             $attachment = 'mimes:' . config('filesystems.mimes') . '|between:0,' . config('filesystems.max_size') * 1024;
         }
 
@@ -41,7 +41,7 @@ class Transaction extends FormRequest
             'contact_id' => 'nullable|integer',
             'category_id' => 'required|integer',
             'payment_method' => 'required|string',
-            'attachment' => $attachment,
+            'attachment.*' => $attachment,
         ];
     }
 

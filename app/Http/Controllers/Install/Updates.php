@@ -3,8 +3,16 @@
 namespace App\Http\Controllers\Install;
 
 use App\Abstracts\Http\Controller;
-use App\Utilities\Updater;
+use App\Events\Install\UpdateCacheCleared;
+use App\Events\Install\UpdateCopied;
+use App\Events\Install\UpdateDownloaded;
+use App\Events\Install\UpdateUnzipped;
+use App\Jobs\Install\CopyFiles;
+use App\Jobs\Install\DownloadFile;
+use App\Jobs\Install\FinishUpdate;
+use App\Jobs\Install\UnzipFile;
 use App\Utilities\Versions;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Http\Request;
 
 class Updates extends Controller
@@ -16,11 +24,11 @@ class Updates extends Controller
      */
     public function index()
     {
-        $updates = Updater::all();
+        $updates = Versions::getUpdates();
 
         $core = null;
 
-        $modules = array();
+        $modules = [];
 
         if (isset($updates['core'])) {
             $core = $updates['core'];
@@ -39,7 +47,6 @@ class Updates extends Controller
                 $m = new \stdClass();
                 $m->name = $row->getName();
                 $m->alias = $row->get('alias');
-                $m->category = $row->get('category');
                 $m->installed = $row->get('version');
                 $m->latest = $updates[$alias];
 
@@ -63,7 +70,10 @@ class Updates extends Controller
     public function check()
     {
         // Clear cache in order to check for updates
-        Updater::clear();
+        Cache::forget('updates');
+        Cache::forget('versions');
+
+        event(new UpdateCacheCleared(company_id()));
 
         return redirect()->back();
     }
@@ -156,7 +166,9 @@ class Updates extends Controller
         set_time_limit(900); // 15 minutes
 
         try {
-            $path = Updater::download($request['alias'], $request['version'], $request['installed']);
+            $path = $this->dispatch(new DownloadFile($request['alias'], $request['version']));
+
+            event(new UpdateDownloaded($request['alias'], $request['version'], $request['installed']));
 
             $json = [
                 'success' => true,
@@ -190,7 +202,9 @@ class Updates extends Controller
         set_time_limit(900); // 15 minutes
 
         try {
-            $path = Updater::unzip($request['path'], $request['alias'], $request['version'], $request['installed']);
+            $path = $this->dispatch(new UnzipFile($request['alias'], $request['path']));
+
+            event(new UpdateUnzipped($request['alias'], $request['version'], $request['installed']));
 
             $json = [
                 'success' => true,
@@ -224,7 +238,9 @@ class Updates extends Controller
         set_time_limit(900); // 15 minutes
 
         try {
-            $path = Updater::copyFiles($request['path'], $request['alias'], $request['version'], $request['installed']);
+            $path = $this->dispatch(new CopyFiles($request['alias'], $request['path']));
+
+            event(new UpdateCopied($request['alias'], $request['version'], $request['installed']));
 
             $json = [
                 'success' => true,
@@ -258,7 +274,7 @@ class Updates extends Controller
         set_time_limit(900); // 15 minutes
 
         try {
-            Updater::finish($request['alias'], $request['version'], $request['installed']);
+            $this->dispatch(new FinishUpdate($request['alias'], $request['version'], $request['installed'], company_id()));
 
             $json = [
                 'success' => true,

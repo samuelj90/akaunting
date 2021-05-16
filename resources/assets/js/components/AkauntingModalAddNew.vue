@@ -22,6 +22,7 @@
                             </div>
                             <div class="modal-body pb-0" v-else>
                                 <form id="form-create" method="POST" action="#"/>
+
                                 <component v-bind:is="component"></component>
                             </div>
                         </slot>
@@ -137,16 +138,18 @@ export default {
     },
 
     created: function () {
-        let documentClasses = document.body.classList;
+        let documentClasses = document.body.classList;	
 
-        documentClasses.add("modal-open");
+        documentClasses.add("modal-open");	
     },
 
     mounted() {
+        let form_prefix = this._uid;
+
         if (this.is_component) {
             this.component = Vue.component('add-new-component', (resolve, reject) => {
                 resolve({
-                    template : '<div id="modal-add-new-form">' + this.message + '</div>',
+                    template : '<div id="modal-add-new-form-' + form_prefix + '">' + this.message + '</div>',
 
                     components: {
                         AkauntingRadioGroup,
@@ -163,7 +166,7 @@ export default {
                     },
 
                     mounted() {
-                        let form_id = document.getElementById('modal-add-new-form').children[0].id;
+                        let form_id = document.getElementById('modal-add-new-form-' + form_prefix).children[0].id;
 
                         this.form = new Form(form_id);
                     },
@@ -235,6 +238,12 @@ export default {
                                 this.form.currency = response.data.currency_name;
                                 this.form.currency_code = response.data.currency_code;
                                 this.form.currency_rate = response.data.currency_rate;
+
+                                this.currency.decimal = response.data.decimal_mark;
+                                this.currency.thousands = response.data.thousands_separator;
+                                this.currency.prefix = (response.data.symbol_first) ? response.data.symbol : '';
+                                this.currency.suffix = (!response.data.symbol_first) ? response.data.symbol : '';
+                                this.currency.precision = parseInt(response.data.precision);
                             })
                             .catch(error => {
                             });

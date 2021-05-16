@@ -8,14 +8,16 @@ return [
         'deleted'           => ':type slettet!',
         'duplicated'        => ':type duplikeret!',
         'imported'          => ':type importeret!',
+        'import_queued'     => ':type import er planlagt! Du vil modtage en e-mail, når den er færdig.',
         'exported'          => ':type exporteret!',
+        'export_queued'     => ':type eksport er planlagt! Du vil modtage en e-mail, når den er klar til download.',
         'enabled'           => ':type aktiveret!',
         'disabled'          => ':type deaktiveret!',
     ],
 
     'error' => [
         'over_payment'      => 'Error: Betaling blev ikke tilføjet! Beløbet du har angivet overstiger: :amount',
-        'not_user_company'  => 'Fejl: Du har ikke tilladelse til at kontrollere denne virksomhed!',
+        'not_user_company'  => 'Fejl: Du har ikke tilladelse til at administrere denne enhed!',
         'customer'          => 'Fejl: Brugeren ikke oprettet! :name bruger allerede denne E-mail.',
         'no_file'           => 'Fejl: Ingen fil valgt!',
         'last_category'     => 'Fejl: Kan ikke slette sidste :type kategori!',
@@ -28,8 +30,8 @@ return [
     'warning' => [
         'deleted'           => 'Advarsel: Du har ikke tilladelse tiil at slette <b>:name</b> fordi den er :text relateret.',
         'disabled'          => 'Advarsel: Du har ikke tilladelse tiil at deaktivere <b>:name</b> fordi den er :text relateret.',
-        'reconciled_tran'   => 'Warning: You are not allowed to change/delete transaction because it is reconciled!',
-        'reconciled_doc'    => 'Warning: You are not allowed to change/delete :type because it has reconciled transactions!',
+        'reconciled_tran'   => 'Advarsel: Du kan ikke ændre eller slette denne transaktion, da den er afstemt.',
+        'reconciled_doc'    => 'Advarsel: Du kan ikke ændre eller slette :type, da den er afstemt.',
         'disable_code'      => 'Advarsel: Du må ikke deaktivere eller ændre valutaen i <b>:name</b> , fordi den er :text relateret.',
         'payment_cancel'    => 'Advarsel: Du har annulleret den seneste :method betaling!',
     ],

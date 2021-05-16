@@ -1,9 +1,9 @@
-@permission(['update-common-widgets', 'delete-common-widgets'])
+@canany(['update-common-widgets', 'delete-common-widgets'])
 <div class="card-header{{ !empty($header_class) ? ' ' . $header_class : '' }}">
     <div class="row align-items-center">
 
         <div class="col-10 text-nowrap">
-            <h4 class="mb-0 long-texts">{{ $class->model->name }}</h4>
+            <h4 class="mb-0 long-texts" title="{{ $class->model->name }}">{{ $class->model->name }}</h4>
         </div>
 
         <div class="col-2 hidden-sm">
@@ -14,22 +14,22 @@
                     </a>
 
                     <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
-                        @permission('update-common-widgets')
+                        @can('update-common-widgets')
                         {!! Form::button(trans('general.edit'), [
                             'type'    => 'button',
                             'class'   => 'dropdown-item',
                             'title'   => trans('general.edit'),
                             '@click'  => 'onEditWidget(' . $class->model->id . ')'
                         ]) !!}
-                        @endpermission
-                        @permission('delete-common-widgets')
+                        @endcan
+                        @can('delete-common-widgets')
                         <div class="dropdown-divider"></div>
-                        {!! Form::deleteLink($class->model, 'common/widgets') !!}
-                        @endpermission
+                        {!! Form::deleteLink($class->model, 'widgets.destroy') !!}
+                        @endcan
                     </div>
                 </div>
             </span>
         </div>
     </div>
 </div>
-@endpermission
+@endcanany

@@ -11,7 +11,7 @@ class Overrider
     public static function load($type)
     {
         // Overrides apply per company
-        $company_id = session('company_id');
+        $company_id = company_id();
         if (empty($company_id)) {
             return;
         }
@@ -25,11 +25,6 @@ class Overrider
 
     protected static function loadSettings()
     {
-        // Set the active company settings
-        setting()->setExtraColumns(['company_id' => static::$company_id]);
-        setting()->forgetAll();
-        setting()->load(true);
-
         // Timezone
         config(['app.timezone' => setting('localisation.timezone', 'UTC')]);
         date_default_timezone_set(config('app.timezone'));
@@ -64,10 +59,8 @@ class Overrider
         $currencies = Currency::all();
 
         foreach ($currencies as $currency) {
-            if (!isset($currency->precision)) {
-                continue;
-            }
-
+            config(['money.' . $currency->code . '.name' => $currency->name]);
+            config(['money.' . $currency->code . '.rate' => $currency->rate]);
             config(['money.' . $currency->code . '.precision' => $currency->precision]);
             config(['money.' . $currency->code . '.symbol' => $currency->symbol]);
             config(['money.' . $currency->code . '.symbol_first' => $currency->symbol_first]);

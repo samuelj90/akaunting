@@ -9,9 +9,9 @@ use App\Models\Banking\Transaction;
 
 class CreateTransaction extends Job
 {
-    protected $request;
-
     protected $transaction;
+
+    protected $request;
 
     /**
      * Create a new job instance.
@@ -32,17 +32,21 @@ class CreateTransaction extends Job
     {
         event(new TransactionCreating($this->request));
 
-        $this->transaction = Transaction::create($this->request->all());
+        \DB::transaction(function () {
+            $this->transaction = Transaction::create($this->request->all());
 
-        // Upload attachment
-        if ($this->request->file('attachment')) {
-            $media = $this->getMedia($this->request->file('attachment'), 'transactions');
+            // Upload attachment
+            if ($this->request->file('attachment')) {
+                foreach ($this->request->file('attachment') as $attachment) {
+                    $media = $this->getMedia($attachment, 'transactions');
 
-            $this->transaction->attachMedia($media, 'attachment');
-        }
+                    $this->transaction->attachMedia($media, 'attachment');
+                }
+            }
 
-        // Recurring
-        $this->transaction->createRecurring();
+            // Recurring
+            $this->transaction->createRecurring($this->request->all());
+        });
 
         event(new TransactionCreated($this->transaction));
 

@@ -3,17 +3,17 @@
 namespace App\BulkActions\Sales;
 
 use App\Abstracts\BulkAction;
-use App\Events\Sale\InvoiceCancelled;
-use App\Events\Sale\InvoiceCreated;
-use App\Events\Sale\InvoiceSent;
-use App\Events\Sale\PaymentReceived;
+use App\Events\Document\DocumentCancelled;
+use App\Events\Document\DocumentCreated;
+use App\Events\Document\DocumentSent;
+use App\Events\Document\PaymentReceived;
 use App\Exports\Sales\Invoices as Export;
-use App\Jobs\Sale\DeleteInvoice;
-use App\Models\Sale\Invoice;
+use App\Jobs\Document\DeleteDocument;
+use App\Models\Document\Document;
 
 class Invoices extends BulkAction
 {
-    public $model = Invoice::class;
+    public $model = Document::class;
 
     public $actions = [
         'paid' => [
@@ -39,6 +39,7 @@ class Invoices extends BulkAction
         'export' => [
             'name' => 'general.export',
             'message' => 'bulk_actions.message.export',
+            'type' => 'download',
         ],
     ];
 
@@ -47,7 +48,12 @@ class Invoices extends BulkAction
         $invoices = $this->getSelectedRecords($request);
 
         foreach ($invoices as $invoice) {
-            event(new PaymentReceived($invoice));
+            // Already in transactions
+            if ($invoice->status == 'paid') {
+                continue;
+            }
+
+            event(new PaymentReceived($invoice, ['type' => 'income']));
         }
     }
 
@@ -56,7 +62,7 @@ class Invoices extends BulkAction
         $invoices = $this->getSelectedRecords($request);
 
         foreach ($invoices as $invoice) {
-            event(new InvoiceSent($invoice));
+            event(new DocumentSent($invoice));
         }
     }
 
@@ -65,7 +71,7 @@ class Invoices extends BulkAction
         $invoices = $this->getSelectedRecords($request);
 
         foreach ($invoices as $invoice) {
-            event(new InvoiceCancelled($invoice));
+            event(new DocumentCancelled($invoice));
         }
     }
 
@@ -76,7 +82,7 @@ class Invoices extends BulkAction
         foreach ($invoices as $invoice) {
             $clone = $invoice->duplicate();
 
-            event(new InvoiceCreated($clone));
+            event(new DocumentCreated($clone, $request));
         }
     }
 
@@ -91,9 +97,9 @@ class Invoices extends BulkAction
 
         foreach ($invoices as $invoice) {
             try {
-                $this->dispatch(new DeleteInvoice($invoice));
+                $this->dispatch(new DeleteDocument($invoice));
             } catch (\Exception $e) {
-                flash($e->getMessage())->error();
+                flash($e->getMessage())->error()->important();
             }
         }
     }

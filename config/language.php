@@ -122,7 +122,7 @@ return [
     | This options indicates the allowed languages.
     |
     */
-    'allowed'       => ['ar-SA', 'bg-BG', 'bn-BD', 'cs-CZ', 'da-DK', 'de-DE', 'el-GR', 'en-GB', 'es-ES', 'es-MX', 'fa-IR', 'fr-FR', 'he-IL', 'hi-IN', 'hr-HR', 'id-ID', 'is-IS', 'it-IT', 'ja-JP', 'ka-GE', 'ko-KR', 'lt-LT', 'lv-LV', 'mk-MK', 'ms-MY', 'nb-NO', 'ne-NP', 'nl-NL', 'pt-BR', 'pt-PT', 'ro-RO', 'ru-RU', 'sk-SK', 'sr-RS', 'sq-AL', 'sv-SE', 'th-TH', 'tr-TR', 'uk-UA', 'ur-PK', 'uz-UZ',  'vi-VN', 'zh-CN', 'zh-TW'],
+    'allowed'       => ['ar-SA', 'az-AZ', 'bg-BG', 'bn-BD', 'bs-BA', 'ca-ES', 'cs-CZ', 'da-DK', 'de-DE', 'el-GR', 'en-AU', 'en-GB', 'en-US', 'es-AR', 'es-ES', 'es-MX', 'fa-IR', 'fr-FR', 'he-IL', 'hi-IN', 'hr-HR', 'hu-HU', 'id-ID', 'is-IS', 'it-IT', 'ja-JP', 'ka-GE', 'ko-KR', 'lt-LT', 'lv-LV', 'mk-MK', 'ms-MY', 'nb-NO', 'ne-NP', 'nl-NL', 'pl-PL', 'pt-BR', 'pt-PT', 'ro-RO', 'ru-RU', 'sk-SK', 'sr-RS', 'sq-AL', 'sv-SE', 'th-TH', 'tr-TR', 'uk-UA', 'ur-PK', 'uz-UZ',  'vi-VN', 'zh-CN', 'zh-TW'],
 
     /*
     |--------------------------------------------------------------------------
@@ -134,8 +134,11 @@ return [
     */
     'all' => [
         ['short' => 'ar',       'long' => 'ar-SA',      'english' => 'Arabic',              'native' => 'العربية'],
+        ['short' => 'az',       'long' => 'az-AZ',      'english' => 'Azerbaijani',         'native' => 'Azərbaycan'],
         ['short' => 'bg',       'long' => 'bg-BG',      'english' => 'Bulgarian',           'native' => 'български'],
         ['short' => 'bn',       'long' => 'bn-BD',      'english' => 'Bengali',             'native' => 'বাংলা'],
+        ['short' => 'bs',       'long' => 'bs-BA',      'english' => 'Bosnian',             'native' => 'Bosanski'],
+        ['short' => 'ca',       'long' => 'ca-ES',      'english' => 'Catalan',             'native' => 'Català'],
         ['short' => 'cn',       'long' => 'zh-CN',      'english' => 'Chinese (S)',         'native' => '简体中文'],
         ['short' => 'cs',       'long' => 'cs-CZ',      'english' => 'Czech',               'native' => 'Čeština'],
         ['short' => 'da',       'long' => 'da-DK',      'english' => 'Danish',              'native' => 'Dansk'],
@@ -143,6 +146,7 @@ return [
         ['short' => 'de',       'long' => 'de-AT',      'english' => 'Austrian',            'native' => 'Österreichisches Deutsch'],
         ['short' => 'fi',       'long' => 'fi-FI',      'english' => 'Finnish',             'native' => 'Suomi'],
         ['short' => 'fr',       'long' => 'fr-FR',      'english' => 'French',              'native' => 'Français'],
+        ['short' => 'ea',       'long' => 'es-AR',      'english' => 'Spanish (Argentina)', 'native' => 'Español de Argentina'],
         ['short' => 'el',       'long' => 'el-GR',      'english' => 'Greek',               'native' => 'Ελληνικά'],
         ['short' => 'en',       'long' => 'en-AU',      'english' => 'English (AU)',        'native' => 'English (AU)'],
         ['short' => 'en',       'long' => 'en-CA',      'english' => 'English (CA)',        'native' => 'English (CA)'],
@@ -166,7 +170,7 @@ return [
         ['short' => 'lv',       'long' => 'lv-LV',      'english' => 'Latvian',             'native' => 'Latviešu valoda'],
         ['short' => 'mk',       'long' => 'mk-MK',      'english' => 'Macedonian',          'native' => 'Македонски јазик'],
         ['short' => 'ms',       'long' => 'ms-MY',      'english' => 'Malay',               'native' => 'Bahasa Melayu'],
-        ['short' => 'mx',       'long' => 'es-MX',      'english' => 'Mexico',              'native' => 'Español de México'],
+        ['short' => 'mx',       'long' => 'es-MX',      'english' => 'Spanish (Mexico)',    'native' => 'Español de México'],
         ['short' => 'nb',       'long' => 'nb-NO',      'english' => 'Norwegian',           'native' => 'Norsk Bokmål'],
         ['short' => 'ne',       'long' => 'ne-NP',      'english' => 'Nepali',              'native' => 'नेपाली'],
         ['short' => 'nl',       'long' => 'nl-NL',      'english' => 'Dutch',               'native' => 'Nederlands'],

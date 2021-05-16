@@ -3,7 +3,7 @@
 @section('title', trans_choice('general.defaults', 1))
 
 @section('content')
-    {!! Form::model($setting, [
+    {!! Form::open([
         'id' => 'setting',
         'method' => 'PATCH',
         'route' => 'settings.update',
@@ -18,29 +18,33 @@
     <div class="card">
         <div class="card-body">
             <div class="row">
-                {{ Form::selectGroup('account', trans_choice('general.accounts', 1), 'university', $accounts, !empty($setting['account']) ? $setting['account'] : null, []) }}
+                {{ Form::selectGroup('account', trans_choice('general.accounts', 1), 'university', $accounts, setting('default.account'), []) }}
 
-                {{ Form::selectGroup('currency', trans_choice('general.currencies', 1), 'exchange-alt', $currencies, !empty($setting['currency']) ? $setting['currency'] : null, []) }}
+                {{ Form::selectGroup('currency', trans_choice('general.currencies', 1), 'exchange-alt', $currencies, setting('default.currency'), []) }}
 
-                {{ Form::selectGroup('tax', trans_choice('general.taxes', 1), 'percent', $taxes, !empty($setting['tax']) ? $setting['tax'] : null, []) }}
+                {{ Form::selectRemoteGroup('income_category', trans('settings.default.income_category'), 'folder', $sales_categories, setting('default.income_category'), ['remote_action' => route('categories.index'). '?search=type:income']) }}
 
-                {{ Form::selectGroup('payment_method', trans_choice('general.payment_methods', 1), 'credit-card', $payment_methods, !empty($setting['payment_method']) ? $setting['payment_method'] : null, []) }}
+                {{ Form::selectRemoteGroup('expense_category', trans('settings.default.expense_category'), 'folder', $purchases_categories, setting('default.expense_category'), ['remote_action' => route('categories.index'). '?search=type:expense']) }}
 
-                {{ Form::selectGroup('locale', trans_choice('general.languages', 1), 'flag', language()->allowed(), !empty($setting['locale']) ? $setting['locale'] : null, []) }}
+                {{ Form::selectGroup('tax', trans_choice('general.taxes', 1), 'percent', $taxes, setting('default.tax'), []) }}
 
-                {{ Form::selectGroup('list_limit', trans('settings.default.list_limit'), 'columns', ['10' => '10', '25' => '25', '50' => '50', '100' => '100'], !empty($setting['list_limit']) ? $setting['list_limit'] : null, []) }}
+                {{ Form::selectGroup('payment_method', trans_choice('general.payment_methods', 1), 'credit-card', $payment_methods, setting('default.payment_method'), []) }}
 
-                {{ Form::radioGroup('use_gravatar', trans('settings.default.use_gravatar'), $setting->get('use_gravatar')) }}
+                {{ Form::selectGroup('locale', trans_choice('general.languages', 1), 'flag', language()->allowed(), setting('default.locale'), []) }}
+
+                {{ Form::selectGroup('list_limit', trans('settings.default.list_limit'), 'columns', ['10' => '10', '25' => '25', '50' => '50', '100' => '100'], setting('default.list_limit'), []) }}
+
+                {{ Form::radioGroup('use_gravatar', trans('settings.default.use_gravatar'), setting('default.use_gravatar')) }}
             </div>
         </div>
 
-        @permission('update-settings-settings')
+        @can('update-settings-settings')
             <div class="card-footer">
                 <div class="row save-buttons">
                     {{ Form::saveButtons('settings.index') }}
                 </div>
             </div>
-        @endpermission
+        @endcan
     </div>
 
     {!! Form::hidden('_prefix', 'default') !!}
